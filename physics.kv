@@ -1,0 +1,492 @@
+#: kivy 1.9.1
+#: import icon kivy.garden.iconfonts.icon
+
+<MenuButton>:
+    size_hint_x: None if not root.inside_group else 1
+    width: self.texture_size[0] + 32
+    Image:
+        allow_stretch: True
+        opacity: 1 if root.icon else 0
+        source: root.icon
+        pos: root.x + 4, root.y + 4
+        size: root.width - 8, root.height - 8
+
+<MenuSubmenu>:
+    size_hint_x: None
+    width: self.texture_size[0] + 32
+    triangle: (self.right-14, self.y+7, self.right-7, self.y+7, self.right-7, self.y+14)
+    canvas.after:
+        Color:
+            rgba: self.separator_color
+        Triangle:
+            points: self.triangle
+
+<MenuButton,MenuSubmenu>:
+    background_normal: ""
+    background_down: ""
+    background_color: self.background_color_down if self.state=='down' else self.background_color_normal
+    color: self.text_color
+
+<MenuEmptySpace>:
+    size_hint_x: 1
+
+<MenuItem>:
+    background_color: self.background_color_normal
+    canvas.before:
+        Color:
+            rgba: self.background_color
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    canvas.after:
+        Color:
+            rgba: self.separator_color
+        Line:
+            rectangle: self.x,self.y,self.width,self.height
+
+<MenuBar>:
+    size_hint_y: None
+    height: 48
+    canvas.before:
+        Color:
+            rgba: self.background_color
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    canvas.after:
+        Color:
+            rgba: self.separator_color
+        Line:
+            rectangle: self.x, self.y, self.width, self.height
+
+<PropertyLayout>:
+    rows: 15
+    cols: 2
+    spacing: 15
+
+    size_hint: 0.4,0.9
+    pos_hint: {'center_x': .95, 'center_y': .5}
+
+    col_default_width: 160
+    col_force_default: True
+
+    row_default_height: 40
+    row_force_default: True
+
+    Label:
+        size: self.texture_size
+        text: '                                     ' + 'Properties'
+        halign: 'center'
+        valign: 'top'
+        font_size: '20sp'
+
+    Label:
+        text: ''
+
+    Label:
+        size: self.texture_size
+        text: 'name:'
+        halign: 'left'
+        valign: 'top'
+        font_size: '18sp'
+
+    TextInput:
+        id: 200
+        multiline: False
+        disabled: True
+        height: '32dp'
+
+    Label:
+        size: self.texture_size
+        text: 'color:'
+        halign: 'left'
+        valign: 'top'
+        font_size: '18sp'
+
+    TextInput:
+        id: 201
+        multiline: False
+        disabled: True
+        height: '32dp'
+
+    Label:
+        size: self.texture_size
+        text: 'position:'
+        halign: 'left'
+        valign: 'top'
+        font_size: '18sp'
+
+    TextInput:
+        id: 202
+        multiline: False
+        disabled: True
+        height: '32dp'
+
+    Label:
+        size: self.texture_size
+        text: 'velocity:'
+        halign: 'left'
+        valign: 'top'
+        font_size: '18sp'
+
+    TextInput:
+        id: 203
+        multiline: False
+        disabled: True
+        height: '32dp'
+
+    Label:
+        size: self.texture_size
+        text: 'mass (for body):'
+        halign: 'left'
+        valign: 'top'
+        font_size: '18dp'
+
+    TextInput:
+        id: 204
+        multiline: False
+        disabled: True
+        height: '32dp'
+
+    Label:
+        size: self.texture_size
+        text: 'k (for spring):'
+        halign: 'left'
+        valign: 'top'
+        font_size: '18sp'
+
+    TextInput:
+        id: 205
+        multiline: False
+        disabled: True
+        height: '32dp'
+
+    Label:
+        size: self.texture_size
+        text: u"\u0394" + u"l (for spring):"
+        halign: 'left'
+        valign: 'top'
+        font_size: '18sp'
+
+    TextInput:
+        id: 206
+        multiline: False
+        disabled: True
+        height: '32dp'
+
+    Label:
+        size: self.texture_size
+        text: u"\u03C6" + u"' (for pendulum):"
+        halign: 'left'
+        valign: 'top'
+        font_size: '18sp'
+
+    TextInput:
+        id: 207
+        multiline: False
+        disabled: True
+        height: '32dp'
+
+    Button:
+        id: 208
+        text: 'Accept changes'
+        on_release: self.parent.changes_value()
+
+
+<CanvasLayout>:
+    canvas.before:
+        Color:
+            rgb: 1., 1., 1.,
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<SettingsLayout>:
+    rows: 20
+    cols: 2
+
+    size_hint: 0.05, 1.0
+
+    col_default_width: 48
+    col_force_default: True
+
+    row_default_height: 48
+    row_force_default: True
+
+    Button:
+        id: 100
+        markup: True
+        text: "%s" % (icon('flaticon-oval',size=32,font_name='flaticon'))
+        on_release: self.parent.set_paintmode(100)
+
+    Button:
+        id: 101
+        markup: True
+        text: "%s" % (icon('flaticon-rectangle',size=32,font_name='flaticon'))
+        on_release: self.parent.set_paintmode(101)
+
+    Button:
+        id: 102
+        text: ""
+        on_release: self.parent.set_paintmode(102)
+        Image:
+            source: ".\\Data\\Images\\cross-circle-outline.png"
+            center_x: self.parent.center_x
+            center_y: self.parent.center_y
+            size: (32,32)
+
+    Button:
+        disabled: True
+
+    Button:
+        disabled: True
+
+    Button:
+        disabled: True
+
+    Button:
+        id: 110
+        markup: True
+        text: "%s" % (icon('fa-arrows',size=32))
+        on_release: self.parent.set_dragmode(110)
+
+    Button:
+        id: 111
+        markup: True
+        text: "%s" % (icon('fa-hand-pointer-o',size=32))
+        on_release: self.parent.set_dragmode(111)
+
+    Button:
+        id: 112
+        markup: True
+        text: "%s" % (icon('fa-trash',size=32))
+        on_release: self.parent.set_dragmode(112)
+
+    Button:
+        id: 113
+        markup: True
+        text: "%s" % (icon('fa-pencil',size=32))
+        on_release: self.parent.set_dragmode(113)
+
+    Button:
+        disabled: True
+
+    Button:
+        disabled: True
+
+    Button:
+        id: 120
+        text: ""
+        on_release: self.parent.set_vectormode(120)
+        Image:
+            source: ".\\Data\\Images\\9430-200.png"
+            center_x: self.parent.center_x
+            center_y: self.parent.center_y
+            size: (32,32)
+
+    Button:
+        id: 121
+        text: ""
+        on_release: self.parent.set_vectormode(121)
+        Image:
+            source: ".\\Data\\Images\\pendulum-512.png"
+            center_x: self.parent.center_x
+            center_y: self.parent.center_y
+            size: (32,32)
+
+    Button:
+        id: 122
+        text: ""
+        on_release: self.parent.set_vectormode(122)
+        Image:
+            source: ".\\Data\\Images\\arrow-icon-28.png"
+            center_x: self.parent.center_x
+            center_y: self.parent.center_y
+            size: (32,32)
+
+    Button:
+        disabled: True
+
+
+
+<PhysicsGUI>:
+
+    orientation: 'vertical'
+
+    MenuBar:
+        pos_hint: {'top':1}
+
+        MenuSubmenu:
+            markup: True
+            text: "File            %s" % (icon('fa-bars'))
+
+            MenuButton:
+                id: 11
+                markup: True
+                text: "New %s" % (icon('fa-file-o'))
+                on_release: app.button(11)
+
+            MenuButton:
+                id: 12
+                markup: True
+                text: "Clear %s" % (icon('fa-eraser'))
+                on_release: app.button(12)
+
+            MenuButton:
+                id: 13
+                markup: True
+                text: "Open %s" % (icon('fa-file-text-o'))
+                on_release: app.button(13)
+
+            MenuButton:
+                id: 14
+                markup: True
+                text: "Save %s" % (icon('fa-file-text'))
+                on_release: app.button(14)
+
+            MenuButton:
+                id: 15
+                markup: True
+                text: "Save as... %s" % (icon('fa-file'))
+                on_release: app.button(15)
+
+            MenuButton:
+                id: 16
+                markup: True
+                text: "Execute... %s" % (icon('fa-terminal'))
+                on_release: app.button(16)
+
+            MenuButton:
+                id: 17
+                markup: True
+                text: "Exit %s" % (icon('fa-times'))
+                on_release: app.button(17)
+
+
+        MenuSubmenu:
+            markup: True
+            text: "Edit                      %s" % (icon('fa-pencil'))
+
+            MenuButton:
+                id: 21
+                markup: True
+                text: "Undo %s" % (icon('fa-undo'))
+                on_release: app.button(21)
+
+            MenuButton:
+                id: 22
+                markup: True
+                text: "Cut %s" % (icon('fa-scissors'))
+                on_release: app.button(22)
+
+            MenuButton:
+                id: 23
+                markup: True
+                text: "Copy %s" % (icon('fa-clone'))
+                on_release: app.button(23)
+
+            MenuButton:
+                id: 24
+                markup: True
+                text: "Insert %s" % (icon('fa-file-text'))
+                on_release: app.button(24)
+
+        MenuSubmenu:
+            markup: True
+            text: "View        %s" % (icon('fa-search'))
+
+            MenuButton:
+                id: 31
+                markup: True
+                text: "Zoom-in %s" % (icon('fa-search-plus'))
+                on_release: app.button(31)
+
+            MenuButton:
+                id: 32
+                markup: True
+                text: "Zoom-out %s" % (icon('fa-search-minus'))
+                on_release: app.button(32)
+
+            MenuButton:
+                id: 33
+                markup: True
+                text: "Zoom 100%"
+                on_release: app.button(33)
+
+        MenuSubmenu:
+            markup: True
+            text: "Environment       %s" % (icon('fa-envira'))
+
+            MenuButton:
+                id: 41
+                text: "Gravity..."
+                on_release: app.button(41)
+
+            MenuButton:
+                id: 42
+                text: "Wind..."
+                on_release: app.button(42)
+
+        MenuSubmenu:
+            text: "Simulation    "
+
+            MenuButton:
+                id: 51
+                markup: True
+                text: "Play %s" % (icon('fa-play'))
+                on_release: app.button(51)
+
+            MenuButton:
+                id: 52
+                markup: True
+                text: "Stop %s" % (icon('fa-stop'))
+                on_release: app.button(52)
+
+            MenuButton:
+                id: 53
+                markup: True
+                text: "Reset %s" % (icon('fa-refresh'))
+                on_release: app.button(53)
+
+        MenuSubmenu:
+            markup: True
+            text: "Help    %s" % (icon('fa-info-circle'))
+
+            MenuButton:
+                id: 61
+                markup: True
+                text: "Reference %s" % (icon('fa-question-circle'))
+                on_release: app.button(61)
+
+            MenuButton:
+                id: 62
+                markup: True
+                text: "About %s" % (icon('fa-code-fork'))
+                on_release: app.button(62)
+
+        MenuEmptySpace:
+
+    MenuBar:
+
+    FloatLayout:
+
+        SettingsLayout:
+
+        PropertyLayout:
+
+        TabbedPanel:
+            size_hint: .6, .95
+            pos_hint: {'center_x': .4, 'center_y': .5}
+            do_default_tab: False
+
+            TabbedPanelItem:
+                text: 'Sheet1'
+                CanvasLayout:
+
+            TabbedPanelItem:
+                text: 'Sheet2'
+                CanvasLayout:
+
+#            TabbedPanelItem:
+#                text: 'Sheet3'
+#                CanvasLayout:
