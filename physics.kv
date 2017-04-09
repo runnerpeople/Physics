@@ -150,6 +150,19 @@
 
     Label:
         size: self.texture_size
+        text: u"g" + u" (for body):"
+        halign: 'left'
+        valign: 'top'
+        font_size: '18sp'
+
+    TextInput:
+        id: 208
+        multiline: False
+        disabled: True
+        height: '32dp'
+
+    Label:
+        size: self.texture_size
         text: 'k (for spring):'
         halign: 'left'
         valign: 'top'
@@ -188,7 +201,7 @@
         height: '32dp'
 
     Button:
-        id: 208
+        id: 209
         text: 'Accept changes'
         on_release: self.parent.changes_value()
 
@@ -486,7 +499,3 @@
             TabbedPanelItem:
                 text: 'Sheet2'
                 CanvasLayout:
-
-#            TabbedPanelItem:
-#                text: 'Sheet3'
-#                CanvasLayout:

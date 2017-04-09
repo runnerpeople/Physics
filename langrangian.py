@@ -9,8 +9,6 @@ import numpy as np
 from objects import *
 import abc
 
-G = lambda x: 0 if type(x) == MeshNonStaticCircle else 9.81
-
 class RungeKutta(object):
     __metaclass__ = abc.ABCMeta
 
@@ -79,37 +77,6 @@ class RungeKuttaTask3(RungeKutta):
         fy[1] = G(0)/self.l
         return fy
 
-# #Spring pendulum
-# class RungeKuttaTask4(RungeKutta):
-#
-#     point = [0,0]
-#
-#     k = 0
-#     m = 0
-#     l = 0
-#
-#     second_var = [0,0]
-#
-#     def f(self,t,y,diff_eq=None):
-#         fy = [0,0]
-#         fy[0] = y[1]
-#         fy[1] = (self.l+y[0])*(self.second_var[1]**2)+G*math.cos(math.radians(self.second_var[0])) - (self.k/self.m)*y[0]
-#         return fy
-#
-#
-# class RungeKuttaTask5(RungeKutta):
-#
-#     point = [0,0]
-#
-#     l = 0
-#
-#     second_var = [0, 0]
-#
-#     def f(self, t, y, diff_eq=None):
-#         fy = [0, 0]
-#         fy[0] = y[1]
-#         fy[1] = (-2/(self.l+self.second_var[0])*self.second_var[1]*y[1])-((G)/(self.l+self.second_var[0])*math.sin(math.radians(y[0])))
-#         return fy
 
 def indexof(list,value):
     for i in range(len(list)):
@@ -119,8 +86,6 @@ def indexof(list,value):
             if list[i].a == value or list[i].b == value:
                 return i
     return -1
-
-
 
 
 class System(object):
@@ -173,21 +138,21 @@ class System(object):
         for i in range(len(self.world)):
             if isinstance(self.world[i], (MeshCircle,MeshSquare, MeshNonStaticCircle)):
                 if result is None:
-                    if G(self.world[i]) == 0:
+                    if self.world[i].g == 0:
                         result += 0
                     else:
-                        result = self.world[i].mass * G(self.world[i]) * self.generalized_coord[coord+1][0]
+                        result = self.world[i].mass * self.world[i].g * self.generalized_coord[coord+1][0]
                 else:
-                    if G(self.world[i]) == 0:
+                    if self.world[i].g == 0:
                         result += 0
                     else:
-                        result += self.world[i].mass * G(self.world[i]) * self.generalized_coord[coord+1][0]
+                        result += self.world[i].mass * self.world[i].g * self.generalized_coord[coord+1][0]
                 coord += 2
             elif isinstance(self.world[i],(MeshPendulum)):
                 if result is None:
-                    result = self.world[i].b.mass * G(self.world[i]) * self.world[i].l * (1 - cos(self.generalized_coord[coord][0]))
+                    result = self.world[i].b.mass * self.world[i].b.g * self.world[i].l * (1 - cos(self.generalized_coord[coord][0]))
                 else:
-                    result += self.world[i].b.mass * G(self.world[i]) * self.world[i].l * (1 - cos(self.generalized_coord[coord][0]))
+                    result += self.world[i].b.mass * self.world[i].b.g * self.world[i].l * (1 - cos(self.generalized_coord[coord][0]))
                 coord += 1
             elif isinstance(self.world[i],(MeshSpring)):
                 first = self.world[i].a
@@ -199,33 +164,33 @@ class System(object):
                    not first.partPendulum and not second.partPendulum:
                     r = (sqrt((self.generalized_coord[indexof(self.world,first)][0]-self.generalized_coord[indexof(self.world,second)][0]) ** 2 +
                                    (self.generalized_coord[indexof(self.world,first)+1][0]-self.generalized_coord[indexof(self.world,second)+1][0]) ** 2) - self.world[i].l) ** 2
-                    if G(first) == 0:
+                    if first.g == 0:
                         p = 0
                     else:
-                        p = first.mass * G(first) * self.generalized_coord[indexof(self.world,first)+1][0]
-                    if G(second) == 0:
+                        p = first.mass * first.g * self.generalized_coord[indexof(self.world,first)+1][0]
+                    if second.g == 0:
                         p2 = 0
                     else:
-                        p2 = second.mass * G(second) * self.generalized_coord[indexof(self.world,second)+1][0]
+                        p2 = second.mass * second.g * self.generalized_coord[indexof(self.world,second)+1][0]
                 elif isinstance(first,(MeshCircle)) and \
                    isinstance(second,(MeshCircle,MeshSquare,MeshNonStaticCircle)) and \
                    first.partPendulum and not second.partPendulum:
                     r = (sqrt((first.Pendulum.l * sin(self.generalized_coord[indexof(self.world,first)][0])+first.Pendulum.a.center[0]-self.generalized_coord[indexof(self.world,second)][0]) ** 2 +
-                                   (first.Pendulum.l * cos(self.generalized_coord[indexof(self.world,first)][0])+first.Pendulum.a.center[1]-self.generalized_coord[indexof(self.world,second)+1][0]) ** 2) - self.world[i].l) ** 2
+                              (first.Pendulum.l * cos(self.generalized_coord[indexof(self.world,first)][0])+first.Pendulum.a.center[1]-self.generalized_coord[indexof(self.world,second)+1][0]) ** 2) - self.world[i].l) ** 2
                     p = 0
-                    if G(second) == 0:
+                    if second.g == 0:
                         p2 = 0
                     else:
-                        p2 = second.mass * G(self.world[i]) * self.generalized_coord[indexof(self.world,second)+1][0]
+                        p2 = second.mass * second.g * self.generalized_coord[indexof(self.world,second)+1][0]
                 elif isinstance(second,(MeshCircle)) and \
                    isinstance(first,(MeshCircle,MeshSquare,MeshNonStaticCircle)) and \
                    second.partPendulum and not first.partPendulum:
                     r = (sqrt((self.generalized_coord[indexof(self.world,first)][0] -   second.Pendulum.l * sin(self.generalized_coord[indexof(self.world,second)][0]) + second.Pendulum.a.center[0]) ** 2 +
                                    (self.generalized_coord[indexof(self.world,first)+1][0] - second.Pendulum.l * cos(self.generalized_coord[indexof(self.world,second)][0]) + second.Pendulum.a.center[1]) ** 2)-self.world[i].l) ** 2
-                    if G(first) == 0:
+                    if first.g == 0:
                         p = 0
                     else:
-                        p = first.mass * G(self.world[i]) * self.generalized_coord[indexof(self.world,first)+1][0]
+                        p = first.mass * first.g * self.generalized_coord[indexof(self.world,first)+1][0]
                     p2 = 0
                 elif isinstance(first,(MeshCircle)) and \
                    isinstance(second,(MeshCircle)) and \

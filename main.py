@@ -91,14 +91,14 @@ class PropertyLayout(GridLayout):
         self.ids[str(id)].text = value
 
     def clear_all(self):
-        for i in range(200,208):
+        for i in range(200,209):
             self.ids[str(i)].text = ''
 
     def disable_all(self):
         self.clear_all()
         self.change = False
         if self.enabled:
-            for i in range(200,208):
+            for i in range(200,209):
                 self.ids[str(i)].disabled = True
             self.enabled = False
 
@@ -113,10 +113,12 @@ class PropertyLayout(GridLayout):
         self.ids['203'].disabled = True
         self.ids['204'].disabled = True
         self.ids['207'].disabled = True
+        self.ids['208'].disabled = False
 
     def enable_for_body(self):
         self.enable_all()
         self.ids['204'].disabled = False
+        self.ids['208'].disabled = False
 
     def enable_for_spring(self):
         self.enable_all()
@@ -250,12 +252,14 @@ class CanvasLayout(FloatLayout):
                             self.properties.set_text(202,tuple_to_str(self.selected.center))
                             self.properties.set_text(203,tuple_to_str(self.selected.velocity))
                             self.properties.set_text(204, str(self.selected.mass))
+                            self.properties.set_text(208, str(self.selected.g))
                         elif type(self.selected) == MeshNonStaticCircle:
                             self.properties.disable_all()
                             self.properties.enable_for_static_body()
                             self.properties.set_text(200, self.selected.group)
                             self.properties.set_text(201, tuple_to_str(self.selected.color.rgba))
                             self.properties.set_text(202, tuple_to_str(self.selected.center))
+                            self.properties.set_text(208, str(self.selected.g))
                     elif isinstance(self.selected, MeshSpring):
                         self.get_layout(PropertyLayout)
                         self.properties.disable_all()
@@ -375,9 +379,13 @@ class CanvasLayout(FloatLayout):
                     except:
                         sys.stderr.write('You need write 1 float value to mass object')
                         self.properties.get_textinput(204).text = str(self.selected.mass)
-                    else:
-                        sys.stderr.write('You need write 1 float value to mass object')
-                        self.properties.get_textinput(204).text = str(self.selected.mass)
+                    validate5 = self.properties.get_textinput(208).text
+                    try:
+                        new_g = float(validate5)
+                        self.selected.g = new_g
+                    except:
+                        sys.stderr.write('You need write 1 float value to gravity constant object')
+                        self.properties.get_textinput(208).text = str(self.selected.g)
                 elif type(self.selected) == MeshNonStaticCircle:
                     self.selected.group = self.properties.get_textinput(200).text
                     validate = self.properties.get_textinput(201).text
@@ -417,9 +425,13 @@ class CanvasLayout(FloatLayout):
                     except:
                         sys.stderr.write('You need write 1 float value to mass object')
                         self.properties.get_textinput(204).text = str(self.selected.mass)
-                    else:
-                        sys.stderr.write('You need write 1 float value to mass object')
-                        self.properties.get_textinput(204).text = str(self.selected.mass)
+                    validate5 = self.properties.get_textinput(208).text
+                    try:
+                        new_g = float(validate5)
+                        self.selected.g = new_g
+                    except:
+                        sys.stderr.write('You need write 1 float value to gravity constant object')
+                        self.properties.get_textinput(208).text = str(self.selected.g)
                 elif type(self.selected) == MeshSpring:
                     self.selected.group = self.properties.get_textinput(200).text
                     validate = self.properties.get_textinput(201).text

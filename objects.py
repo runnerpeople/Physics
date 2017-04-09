@@ -5,6 +5,8 @@ from kivy.graphics import *
 import math
 import sys
 
+G = 9.807
+
 class MeshCircle(Mesh):
     def __init__(self,**kwargs):
         super(MeshCircle, self).__init__(**kwargs)
@@ -18,6 +20,8 @@ class MeshCircle(Mesh):
 
         self.radius_circle = 0
         self.center = []
+
+        self.g = G
 
         self.move_flag = False
 
@@ -124,6 +128,8 @@ class MeshNonStaticCircle(Mesh):
 
         self.move_flag = False
 
+        self.g = 0
+
         self.partPendulum = None
         self.Pendulum = None
         try:
@@ -212,6 +218,8 @@ class MeshSquare(Mesh):
         self.connected = []
 
         self.center = []
+
+        self.g = G
 
         self.move_flag = False
 
