@@ -24,6 +24,7 @@ class MeshCircle(Mesh):
         self.velocity_vector = None
 
         self.partPendulum = None
+        self.Pendulum = None
         try:
             self.partPendulum = kwargs['pendulum']
         except:
@@ -124,10 +125,13 @@ class MeshNonStaticCircle(Mesh):
         self.move_flag = False
 
         self.partPendulum = None
+        self.Pendulum = None
         try:
             self.partPendulum = kwargs['pendulum']
         except:
             self.partPendulum = False
+
+
 
     def add_static_lines(self,*args):
         for elem in args:
@@ -214,6 +218,7 @@ class MeshSquare(Mesh):
         self.velocity_vector = None
 
         self.partPendulum = False
+        self.Pendulum = None
 
     def add_conn(self,value):
         self.connected.append(value)

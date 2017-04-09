@@ -714,6 +714,8 @@ class CanvasLayout(FloatLayout):
 
             color = Color(*self.get_color())
             mesh_object = MeshPendulum(name=self.nextName("pendulum"), color=color, a=first_object, b=second_object)
+            first_object.Pendulum = mesh_object
+            second_object.Pendulum = mesh_object
             mesh_object.setMinMax(min(points[0][0], points[1][0]), max(points[0][0], points[1][0]),
                                   min(points[0][1], points[1][1]), max(points[0][1], points[1][1]))
             points_ext = mesh_object.extreme_points()

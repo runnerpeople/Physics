@@ -191,24 +191,24 @@ class System(object):
                 elif isinstance(first,(MeshCircle)) and \
                    isinstance(second,(MeshCircle,MeshSquare,MeshNonStaticCircle)) and \
                    first.partPendulum and not second.parkPendulum:
-                    r = (math.sqrt((first.l * sin(self.generalized_coord[coord][0])+first.center[0]-self.generalized_coord[coord+1][0]) ** 2 +
-                                   (first.l * cos(self.generalized_coord[coord][0])+first.center[1]-self.generalized_coord[coord+2][0]) ** 2) - self.world[i].l) ** 2
+                    r = (math.sqrt((first.l * sin(self.generalized_coord[coord][0])+first.Pendulum.a.center[0]-self.generalized_coord[coord+1][0]) ** 2 +
+                                   (first.l * cos(self.generalized_coord[coord][0])+first.Pendulum.a.center[1]-self.generalized_coord[coord+2][0]) ** 2) - self.world[i].l) ** 2
                     p = 0
                     p2 = second.mass * G(self.world[i]) * self.generalized_coord[coord + 2][0]
                     inc = 3
                 elif isinstance(second,(MeshCircle)) and \
                    isinstance(first,(MeshCircle,MeshSquare,MeshNonStaticCircle)) and \
                    second.partPendulum and not first.parkPendulum:
-                    r = (math.sqrt((self.generalized_coord[coord][0] -   second.l * sin(self.generalized_coord[coord + 2][0]) + second.center[0]) ** 2 +
-                                   (self.generalized_coord[coord+1][0] - second.l * cos(self.generalized_coord[coord + 2][0]) + second.center[1]) ** 2)-self.world[i].l) ** 2
+                    r = (math.sqrt((self.generalized_coord[coord][0] -   second.l * sin(self.generalized_coord[coord + 2][0]) + second.Pendulum.a.center[0]) ** 2 +
+                                   (self.generalized_coord[coord+1][0] - second.l * cos(self.generalized_coord[coord + 2][0]) + second.Pendulum.a.center[1]) ** 2)-self.world[i].l) ** 2
                     p = first.mass * G(self.world[i]) * self.generalized_coord[coord + 1][0]
                     p2 = 0
                     inc = 3
                 elif isinstance(first,(MeshCircle)) and \
                    isinstance(second,(MeshCircle)) and \
                    second.partPendulum and first.parkPendulum:
-                    r = (math.sqrt((first.l * sin(self.generalized_coord[coord][0])+first.center[0] - second.l * sin(self.generalized_coord[coord + 2][0]) + second.center[0]) ** 2 +
-                                   (first.l * cos(self.generalized_coord[coord][0])+first.center[1] - second.l * cos(self.generalized_coord[coord + 2][0]) + second.center[1]) ** 2)-self.world[i].l) ** 2
+                    r = (math.sqrt((first.l * sin(self.generalized_coord[coord][0])+first.Pendulum.a.center[0] - second.l * sin(self.generalized_coord[coord + 2][0]) + second.Pendulum.a.center[0]) ** 2 +
+                                   (first.l * cos(self.generalized_coord[coord][0])+first.Pendulum.a.center[1] - second.l * cos(self.generalized_coord[coord + 2][0]) + second.Pendulum.a.center[1]) ** 2)-self.world[i].l) ** 2
                     p = 0
                     p2 = 0
                     inc = 2
