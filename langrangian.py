@@ -193,7 +193,6 @@ class System(object):
                 first = self.world[i].a
                 second = self.world[i].b
                 r = None
-                inc = 0
                 p,p2 = None, None
                 if isinstance(first,(MeshCircle,MeshSquare,MeshNonStaticCircle)) and \
                    isinstance(second,(MeshCircle,MeshSquare,MeshNonStaticCircle)) and \
@@ -208,7 +207,6 @@ class System(object):
                         p2 = 0
                     else:
                         p2 = second.mass * G(second) * self.generalized_coord[indexof(self.world,second)+1][0]
-                    inc = 4
                 elif isinstance(first,(MeshCircle)) and \
                    isinstance(second,(MeshCircle,MeshSquare,MeshNonStaticCircle)) and \
                    first.partPendulum and not second.partPendulum:
@@ -219,7 +217,6 @@ class System(object):
                         p2 = 0
                     else:
                         p2 = second.mass * G(self.world[i]) * self.generalized_coord[indexof(self.world,second)+1][0]
-                    inc = 3
                 elif isinstance(second,(MeshCircle)) and \
                    isinstance(first,(MeshCircle,MeshSquare,MeshNonStaticCircle)) and \
                    second.partPendulum and not first.partPendulum:
@@ -230,7 +227,6 @@ class System(object):
                     else:
                         p = first.mass * G(self.world[i]) * self.generalized_coord[indexof(self.world,first)+1][0]
                     p2 = 0
-                    inc = 3
                 elif isinstance(first,(MeshCircle)) and \
                    isinstance(second,(MeshCircle)) and \
                    second.partPendulum and first.partPendulum:
@@ -238,14 +234,12 @@ class System(object):
                                    (first.Pendulum.l * cos(self.generalized_coord[indexof(self.world,first)][0])+first.Pendulum.a.center[1] - second.Pendulum.l * cos(self.generalized_coord[indexof(self.world,second)][0]) + second.Pendulum.a.center[1]) ** 2)-self.world[i].l) ** 2
                     p = 0
                     p2 = 0
-                    inc = 2
                 if result is None:
                     result = self.world[i].k * r / 2
                 else:
                     result += self.world[i].k * r / 2
                 result += p
                 result += p2
-                coord += inc
         return result
 
     def langrangian(self):
@@ -256,6 +250,7 @@ class System(object):
         self.odeint()
 
     def odeint(self):
+        print(self.freedom)
         print(self.kinetic_energy_var)
         print(self.potential_energy_var)
         print(self.system)
