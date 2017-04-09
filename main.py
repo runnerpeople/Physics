@@ -210,8 +210,6 @@ class CanvasLayout(FloatLayout):
             elif isinstance(object,(MeshSpring)):
                 self.mass_generalized.append(0)
                 self.world_result.append(object)
-                self.world_result.remove(object.a)
-                self.world_result.remove(object.b)
             elif isinstance(object,(MeshPendulum)):
                 self.mass_generalized.pop()
                 self.mass_generalized.pop()
