@@ -3,6 +3,7 @@
 
 # Using SymPy
 from sympy.physics.mechanics import *
+from sympy.utilities.lambdify import lambdify, implemented_function
 from sympy import *
 import numpy as np
 
@@ -12,7 +13,7 @@ import abc
 class RungeKutta(object):
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self,t0,y0):
+    def __init__(self,t0,y0,diff_eq=None,name_coord=None):
         self.t = t0
         self.y = y0
         self.yy = [0,0]
@@ -20,9 +21,11 @@ class RungeKutta(object):
         self.y2 = [0,0]
         self.y3 = [0,0]
         self.y4 = [0,0]
+        self.diff_eq = diff_eq
+        self.name_coord = name_coord
 
     @abc.abstractclassmethod
-    def f(self,t,y,diff_eq):
+    def f(self,t,y):
         pass
 
     def nextStep(self,dt):
@@ -47,34 +50,11 @@ class RungeKutta(object):
 
         self.t += dt
 
-# y' = t
-# t' = 0 (t - non-dependent variable)
-class RungeKuttaTask1(RungeKutta):
-    def f(self,t,y,diff_eq=None):
+class RungeKuttaImpl(RungeKutta):
+    def f(self,t,y):
         fy = [0,0]
         fy[0] = y[1]
-        fy[1] = -0
-        return fy
-
-# y' = gx
-# g = g (g = 9.87)
-class RungeKuttaTask2(RungeKutta):
-    def f(self,t,y,diff_eq=None):
-        fy = [0,0]
-        fy[0] = y[1]
-        fy[1] = -G(0)
-        return fy
-
-# y' = (g/l)*y
-# g/l  (g = 9.87)
-class RungeKuttaTask3(RungeKutta):
-
-    l = 0
-
-    def f(self,t,y,diff_eq=None):
-        fy = [0,0]
-        fy[0] = y[1]
-        fy[1] = G(0)/self.l
+        fy[1] = self.diff_eq.subs(self.name_coord,self.y[0])
         return fy
 
 
@@ -139,7 +119,7 @@ class System(object):
             if isinstance(self.world[i], (MeshCircle,MeshSquare, MeshNonStaticCircle)):
                 if result is None:
                     if self.world[i].g == 0:
-                        result += 0
+                        result = 0
                     else:
                         result = self.world[i].mass * self.world[i].g * self.generalized_coord[coord+1][0]
                 else:
@@ -215,80 +195,51 @@ class System(object):
         self.odeint()
 
     def odeint(self):
-        print(self.freedom)
-        print(self.kinetic_energy_var)
-        print(self.potential_energy_var)
         print(self.system)
-        x0, y0 = [],[]
-        x_, y_ = [],[]
+        x0,y0,phi0 = [],[],[]
+        x_,y_,phi_ = [],[],[]
         for i in range(len(self.world)):
-            if isinstance(self.world[i], (MeshCircle, MeshSquare)):
-                for conn in self.world[i].connected:
-                    if isinstance(conn, MeshSpring):
-                        x0.append(math.sqrt(conn.velocity[0]**2+conn.velocity[1]**2))
-                        y0.append(conn.phi)
-                        x_.append(math.sqrt(self.world[i].velocity[0]**2+self.world[i].velocity[1]**2))
-                        y_.append(math.sqrt(conn.k/self.world[i].mass))
-                if self.world[i].connected == []:
-                    x0.append(self.world[i].center[0])
-                    y0.append(self.world[i].center[1])
+            if isinstance(self.world[i], (MeshCircle, MeshSquare,MeshNonStaticCircle)):
+                x0.append(self.world[i].center[0])
+                y0.append(self.world[i].center[1])
+                if isinstance(self.world[i], (MeshCircle, MeshSquare)):
                     x_.append(self.world[i].velocity[0])
                     y_.append(self.world[i].velocity[1])
+                else:
+                    x_.append(0)
+                    y_.append(0)
+            elif isinstance(self.world[i],(MeshPendulum)):
+                phi0.append(self.world[i].phi)
+                phi_.append(self.world[i].phi0)
 
+        dt = 0.05
+        t = Symbol('t')
 
-        dt = 1.0 / 30.0
-
-        x, y = [],[]
-
+        x,y,phi = [],[],[]
+        equation = 0
         for i in range(len(self.world)):
-            if isinstance(self.world[i], (MeshCircle, MeshSquare)):
-                for conn in self.world[i].connected:
-                    if isinstance(conn, MeshSpring):
-                        x_new,y_new = RungeKuttaTask4(dt,[x0.pop(),x_.pop()]),RungeKuttaTask5(dt,[y0.pop(),y_.pop()])
-                        x_new.k,x_new.l,x_new.m = conn.k,conn.l,self.world[i].mass
-                        y_new.l = conn.l
-                        x.append(x_new)
-                        y.append(y_new)
-                        x_new.point = conn.find_rotate_point(self.world[i])
-                        y_new.point = conn.find_rotate_point(self.world[i])
-                if self.world[i].connected == []:
-                    x.append(RungeKuttaTask1(dt,[x0.pop(),x_.pop()]))
-                    y.append(RungeKuttaTask2(dt,[y0.pop(),y_.pop()]))
+            if isinstance(self.world[i], (MeshCircle, MeshSquare, MeshNonStaticCircle)):
+                x.append(RungeKuttaImpl(0,[x0.pop(0),x_.pop(0)],-(self.system[equation]/self.mass_generalized[equation]-diff(self.generalized_coord[equation][1],t)),self.generalized_coord[equation][0]))
+                y.append(RungeKuttaImpl(0,[y0.pop(0),y_.pop(0)],-(self.system[equation+1]/self.mass_generalized[equation]-diff(self.generalized_coord[equation+1][1],t)),self.generalized_coord[equation+1][0]))
+                equation += 2
+            elif isinstance(self.world[i], (MeshPendulum)):
+                phi.append(RungeKuttaImpl(0,[phi0.pop(0),phi_.pop(0)],-(self.system[equation]/self.mass_generalized[equation]-diff(self.generalized_coord[equation][1],t)),self.generalized_coord[equation][0]))
+                equation += 1
 
-        self.result_x = [[] for _ in range(len(x))]
-        self.result_y = [[] for _ in range(len(y))]
+        self.result_x   = [[] for _ in range(len(x))]
+        self.result_y   = [[] for _ in range(len(y))]
+        self.result_phi = [[] for _ in range(len(phi))]
 
-        self.static_x = []
-        self.static_y = []
-
-        coord = 0
-        for i in range(len(self.world)):
-            if isinstance(self.world[i], (MeshCircle, MeshSquare)):
-                self.result_x[coord].append(self.world[i].center[0])
-                self.result_y[coord].append(self.world[i].center[1])
-                coord += 1
-            elif type(self.world[i])==MeshNonStaticCircle:
-                self.static_x.append(self.world[i].center[0])
-                self.static_y.append(self.world[i].center[1])
 
         for i in range(len(x)):
-            while x[i].t < 20 and y[i].t < 20:
-                if type(x[i]) == RungeKuttaTask4:
-                    x[i].second_var = [y[i].y[0],y[i].y[1]]
-                    y[i].second_var = [x[i].y[0],x[i].y[1]]
+            while x[i].t < 15 and y[i].t < 15:
+                print(x[i].y[0],y[i].y[0])
                 x[i].nextStep(dt)
                 y[i].nextStep(dt)
-                if type(x[i]) == RungeKuttaTask4:
-                    # transform to x and y
-                    x_result = x[i].point.center[0] + ((x[i].l + x[i].y[0]) * sin(math.radians(y[i].y[0])))
-                    y_result = y[i].point.center[1] - ((x[i].l + x[i].y[0]) * cos(math.radians(y[i].y[0])))
-                    self.result_x[i].extend([x_result])
-                    self.result_y[i].extend([y_result])
-                    print(x[i].y)
-                    print(y[i].y)
-                else:
-                    self.result_x[i].extend([x[i].y[0]])
-                    self.result_y[i].extend([y[i].y[0]])
-            print(self.result_x[i])
-            print(self.result_y[i])
+                self.result_x[i].extend([x[i].y[0]])
+                self.result_y[i].extend([y[i].y[0]])
 
+        for i in range(len(phi)):
+            while phi[i].t < 15:
+                phi[i].nextStep(dt)
+                self.result_phi[i].extend([phi[i].y[0]])

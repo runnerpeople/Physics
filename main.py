@@ -519,7 +519,7 @@ class CanvasLayout(FloatLayout):
                     validate4 = self.properties.get_textinput(207).text
                     try:
                         new_phi0 = float(validate4)
-                        self.selected.phi0 = new_phi0
+                        self.selected.phi0 = math.radians(new_phi0)
                     except:
                         sys.stderr.write('You need write 1 float value to phi0 pendulum')
                         self.properties.get_textinput(207).text = str(self.selected.phi0)
@@ -735,7 +735,7 @@ class CanvasLayout(FloatLayout):
                             points[0][0]+2, points[0][1], 0, 0, points[0][0]+c*math.sin(phi)+2,points[0][1]-c*math.cos(phi), 0, 0]
 
             mesh_object.l = c
-            mesh_object.phi = math.degrees(phi)
+            mesh_object.phi = phi
             mesh_object.center = center_point
             mesh_object.vertices = spring_point
             mesh_object.indices = range(len(spring_point) // 4)
