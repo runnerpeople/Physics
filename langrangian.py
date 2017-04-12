@@ -149,7 +149,7 @@ class System(object):
                               (self.generalized_coord[self.start_position[indexof(self.world,first)]+1][0]-self.generalized_coord[self.start_position[indexof(self.world,second)]+1][0]) ** 2) - self.world[i].l) ** 2
                     p = 0
                     p2 = 0
-                elif isinstance(first,(MeshCircle)) and \
+                elif isinstance(first,(MeshSquare)) and \
                    isinstance(second,(MeshCircle,MeshSquare,MeshNonStaticCircle)) and \
                    first.partPendulum and not second.partPendulum:
                     r = (sqrt((first.Pendulum.l * sin(self.generalized_coord[self.start_position[indexof(self.world,first)]][0])+first.Pendulum.a.center[0]-self.generalized_coord[self.start_position[indexof(self.world,second)]][0]) ** 2 +
@@ -159,21 +159,23 @@ class System(object):
                         p2 = 0
                     else:
                         p2 = second.mass * second.g * self.generalized_coord[self.start_position[indexof(self.world,second)]+1][0]
-                elif isinstance(second,(MeshCircle)) and \
+                elif isinstance(second,(MeshSquare)) and \
                    isinstance(first,(MeshCircle,MeshSquare,MeshNonStaticCircle)) and \
                    second.partPendulum and not first.partPendulum:
-                    r = (sqrt((self.generalized_coord[self.start_position[indexof(self.world,first)]][0] -   second.Pendulum.l * sin(self.generalized_coord[self.start_position[indexof(self.world,second)]][0]) + second.Pendulum.a.center[0]) ** 2 +
-                              (self.generalized_coord[self.start_position[indexof(self.world,first)]+1][0] - second.Pendulum.l * cos(self.generalized_coord[self.start_position[indexof(self.world,second)]][0]) + second.Pendulum.a.center[1]) ** 2)-self.world[i].l) ** 2
+                    first_pos = self.start_position[indexof(self.world,first)]
+                    second_pos = self.start_position[indexof(self.world,second)]
+                    r = (sqrt((self.generalized_coord[first_pos][0] -   second.Pendulum.l * sin(self.generalized_coord[second_pos][0]) - second.Pendulum.a.center[0]) ** 2 +
+                              (self.generalized_coord[first_pos+1][0] - second.Pendulum.l * cos(self.generalized_coord[second_pos][0]) - second.Pendulum.a.center[1]) ** 2)-self.world[i].l) ** 2
                     if first.g == 0:
                         p = 0
                     else:
                         p = first.mass * first.g * self.generalized_coord[self.start_position[indexof(self.world,first)]+1][0]
                     p2 = 0
-                elif isinstance(first,(MeshCircle)) and \
-                   isinstance(second,(MeshCircle)) and \
+                elif isinstance(first,(MeshSquare)) and \
+                   isinstance(second,(MeshSquare)) and \
                    second.partPendulum and first.partPendulum:
-                    r = (sqrt((first.Pendulum.l * sin(self.generalized_coord[self.start_position[indexof(self.world,first)]][0])+first.Pendulum.a.center[0] - second.Pendulum.l * sin(self.generalized_coord[self.start_position[indexof(self.world,second)]][0]) + second.Pendulum.a.center[0]) ** 2 +
-                              (first.Pendulum.l * cos(self.generalized_coord[self.start_position[indexof(self.world,first)]][0])+first.Pendulum.a.center[1] - second.Pendulum.l * cos(self.generalized_coord[self.start_position[indexof(self.world,second)]][0]) + second.Pendulum.a.center[1]) ** 2)-self.world[i].l) ** 2
+                    r = (sqrt((first.Pendulum.l * sin(self.generalized_coord[self.start_position[indexof(self.world,first)]][0])+first.Pendulum.a.center[0] - second.Pendulum.l * sin(self.generalized_coord[self.start_position[indexof(self.world,second)]][0]) - second.Pendulum.a.center[0]) ** 2 +
+                              (first.Pendulum.l * cos(self.generalized_coord[self.start_position[indexof(self.world,first)]][0])+first.Pendulum.a.center[1] - second.Pendulum.l * cos(self.generalized_coord[self.start_position[indexof(self.world,second)]][0]) - second.Pendulum.a.center[1]) ** 2)-self.world[i].l) ** 2
                     p = 0
                     p2 = 0
                 if result is None:
@@ -192,8 +194,15 @@ class System(object):
         self.odeint()
 
     def odeint(self):
+        # for i in range(len(self.system)):
+        #     print(self.system[i])
+        # print(self.kinetic_energy_var)
+        # print(self.potential_energy_var)
+
         x0,y0,phi0 = [],[],[]
         x_,y_,phi_ = [],[],[]
+
+
         for i in range(len(self.world)):
             if isinstance(self.world[i], (MeshCircle, MeshSquare,MeshNonStaticCircle)):
                 x0.append(self.world[i].center[0])
@@ -226,7 +235,7 @@ class System(object):
                 phi.append(RungeKuttaImpl(0,[phi0.pop(0),phi_.pop(0)],-(self.system[equation]/self.mass_generalized[i]-diff(self.generalized_coord[equation][1],t)),self.generalized_coord[equation]))
                 equation += 1
 
-        time_animation = 40
+        time_animation = 25
 
         self.result_x   = [[] for _ in range(len(x))]
         self.result_y   = [[] for _ in range(len(y))]
@@ -237,30 +246,23 @@ class System(object):
                 list_variable = []
                 list_value = []
                 for j in range(len(x)):
-                    list_variable.append(x[j].name_coord[0])
-                    list_value.append(x[j].y[0])
-                    list_variable.append(x[j].name_coord[1])
-                    list_value.append(x[j].y[1])
-                    list_variable.append(y[j].name_coord[0])
-                    list_value.append(y[j].y[0])
-                    list_variable.append(y[j].name_coord[1])
-                    list_value.append(y[j].y[1])
+                    for m in range(2):
+                        list_variable.append(x[j].name_coord[m])
+                        list_value.append(x[j].y[m])
+                        list_variable.append(y[j].name_coord[m])
+                        list_value.append(y[j].y[m])
+
                 for k in range(len(phi)):
-                    list_variable.append(phi[k].name_coord[0])
-                    list_value.append(phi[k].y[0])
-                    list_variable.append(phi[k].name_coord[1])
-                    list_value.append(phi[k].y[1])
+                    for m in range(2):
+                        list_variable.append(phi[k].name_coord[m])
+                        list_value.append(phi[k].y[m])
                 for z in range(len(x)):
                     x[z].init_values(list_variable, list_value)
                     y[z].init_values(list_variable, list_value)
                 for m in range(len(phi)):
                     phi[m].init_values(list_variable, list_value)
 
-
                 for i in range(len(x)):
-                    # with open('test%d.csv' % (i), 'a', newline='') as csvfile:
-                    #     writer = csv.writer(csvfile, delimiter=';',quotechar='|', quoting=csv.QUOTE_MINIMAL)
-                    #     writer.writerow([str(x[i].t).replace(".",","),str(x[i].y[0]).replace(".",","),str(y[i].y[0]).replace(".",",")])
                     x[i].nextStep(dt)
                     y[i].nextStep(dt)
                     self.result_x[i].extend([x[i].y[0]])
@@ -273,13 +275,14 @@ class System(object):
                 list_variable = []
                 list_value = []
                 for k in range(len(phi)):
-                    list_variable.append(phi[k].name_coord[0])
-                    list_value.append(phi[k].y[0])
-                    list_variable.append(phi[k].name_coord[1])
-                    list_value.append(phi[k].y[1])
+                    for m in range(2):
+                        list_variable.append(phi[k].name_coord[m])
+                        list_value.append(phi[k].y[m])
                 for m in range(len(phi)):
                     phi[m].init_values(list_variable, list_value)
                 for i in range(len(phi)):
+                    # with open('test%d.csv' % (i), 'a', newline='') as csvfile:
+                    #     writer = csv.writer(csvfile, delimiter=';',quotechar='|', quoting=csv.QUOTE_MINIMAL)
+                    #     writer.writerow([str(phi[i].t).replace(".",","),str(phi[i].y[0]).replace(".",",")])
                     phi[i].nextStep(dt)
                     self.result_phi[i].extend([phi[i].y[0]])
-

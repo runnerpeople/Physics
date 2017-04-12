@@ -225,8 +225,12 @@ class MeshSquare(Mesh):
 
         self.velocity_vector = None
 
-        self.partPendulum = False
+        self.partPendulum = None
         self.Pendulum = None
+        try:
+            self.partPendulum = kwargs['pendulum']
+        except:
+            self.partPendulum = False
 
     def add_conn(self,value):
         self.connected.append(value)
